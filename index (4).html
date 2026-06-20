@@ -1,0 +1,1313 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ระบบเวรจราจร รด.</title>
+<style>
+  :root{
+    --olive-50:#F4F3EC;
+    --olive-100:#E4E2D2;
+    --olive-200:#C9C6A8;
+    --olive-300:#A8A578;
+    --olive-500:#5B5E3D;
+    --olive-600:#454827;
+    --olive-700:#33351C;
+    --olive-900:#1E1F11;
+    --paper:#FBFAF6;
+    --paper-2:#F1EFE5;
+    --ink:#2A2A24;
+    --ink-soft:#6B6A5E;
+    --amber:#B8841F;
+    --amber-50:#FBF1DF;
+    --red:#8C2E27;
+    --red-50:#F7E7E4;
+    --line:#D8D5C5;
+    --radius:10px;
+    --font-head:'Bai Jamjuree','Sarabun',system-ui,sans-serif;
+    --font-body:'Sarabun',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;overflow-x:hidden;}
+  body{
+    background:var(--olive-700);
+    background-image:
+      linear-gradient(180deg, var(--olive-700) 0%, var(--olive-700) 220px, var(--paper-2) 220px, var(--paper-2) 100%);
+    font-family:var(--font-body);
+    color:var(--ink);
+    min-height:100vh;
+    padding-bottom:60px;
+  }
+  a{color:var(--olive-600);}
+
+  /* ===== Top bar ===== */
+  .topbar{
+    max-width:880px;margin:0 auto;
+    padding:28px 20px 18px;
+    display:flex;align-items:center;justify-content:space-between;
+    gap:16px;
+  }
+  .brand{display:flex;align-items:center;gap:14px;}
+  .brand-badge{
+    width:46px;height:46px;border-radius:50%;
+    background:var(--olive-900);
+    border:1px solid var(--olive-300);
+    display:flex;align-items:center;justify-content:center;
+    color:var(--olive-100);font-family:var(--font-head);font-weight:700;font-size:15px;
+    letter-spacing:0.5px;flex-shrink:0;
+  }
+  .brand-text h1{
+    font-family:var(--font-head);
+    font-size:19px;font-weight:700;color:var(--paper);margin:0;
+    letter-spacing:0.3px;
+  }
+  .brand-text p{
+    font-size:12.5px;color:var(--olive-200);margin:2px 0 0;
+    letter-spacing:0.4px;
+  }
+  .date-chip{
+    background:rgba(255,255,255,0.06);
+    border:1px solid rgba(255,255,255,0.15);
+    color:var(--olive-100);
+    font-size:13px;padding:7px 14px;border-radius:20px;
+    white-space:nowrap;
+  }
+  .logout-btn{
+    background:transparent;border:1px solid rgba(255,255,255,0.25);
+    color:var(--olive-200);font-size:12.5px;padding:7px 12px;border-radius:8px;
+    cursor:pointer;font-family:var(--font-body);
+  }
+  .logout-btn:hover{background:rgba(255,255,255,0.08);}
+
+  /* ===== Container ===== */
+  .wrap{max-width:880px;margin:0 auto;padding:0 20px;}
+
+  /* ===== Section heading ===== */
+  .sec-head{
+    display:flex;align-items:baseline;gap:10px;margin:0 0 14px;
+  }
+  .sec-num{
+    font-family:var(--font-head);font-weight:700;font-size:12px;
+    color:var(--olive-500);letter-spacing:1px;
+    border:1px solid var(--olive-300);border-radius:4px;
+    padding:2px 7px;
+  }
+  .sec-head h2{
+    font-family:var(--font-head);font-size:18px;font-weight:700;
+    margin:0;color:var(--olive-700);letter-spacing:0.2px;
+  }
+  .sec-sub{font-size:12.5px;color:var(--ink-soft);margin:2px 0 14px 0;}
+
+  /* ===== Duty board (signature element) ===== */
+  .board-shell{
+    margin-top:-46px;
+    margin-bottom:34px;
+  }
+  .duty-board{
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    box-shadow:0 10px 24px -14px rgba(30,31,17,0.45);
+    padding:0;
+    overflow:hidden;
+  }
+  .duty-board-tab{
+    background:var(--olive-600);
+    color:var(--olive-50);
+    font-family:var(--font-head);
+    font-size:12.5px;font-weight:700;letter-spacing:1.2px;
+    padding:9px 22px;
+    display:flex;justify-content:space-between;align-items:center;
+  }
+  .duty-board-tab span.dot{
+    display:inline-block;width:7px;height:7px;border-radius:50%;
+    background:var(--amber);margin-right:7px;
+  }
+  .duty-board-body{padding:22px 24px 24px;}
+  .duty-grid{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+    gap:14px;margin-bottom:18px;
+  }
+  .duty-slot{
+    background:var(--paper-2);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:12px 14px;
+  }
+  .duty-slot label{
+    display:block;font-size:11.5px;color:var(--ink-soft);
+    text-transform:uppercase;letter-spacing:0.6px;margin-bottom:7px;
+    font-weight:500;
+  }
+  .duty-slot .slot-fields{display:flex;gap:8px;}
+  .duty-slot input{flex:1;min-width:0;}
+  .duty-slot .name-input{flex:1.6;}
+  .duty-slot .slot-meta-row{display:flex;gap:8px;margin-top:8px;}
+  .duty-slot .slot-meta-row select{flex:1;min-width:0;}
+  .duty-slot .slot-custom-task{margin-top:8px;display:none;}
+  .duty-slot .slot-custom-task.show{display:block;}
+  .empty-slot-text{
+    font-size:13px;color:var(--olive-300);font-style:italic;padding:8px 2px;
+  }
+
+  .checklist-item{
+    background:var(--paper-2);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:12px 14px;
+    display:flex;align-items:center;gap:10px;
+    cursor:pointer;
+    transition:background 0.15s, border-color 0.15s;
+  }
+  .checklist-item:hover{background:#ECEAD9;}
+  .checklist-item.checked{
+    background:#EAF0E0;border-color:var(--olive-300);
+  }
+  .checklist-item input[type="checkbox"]{
+    width:18px;height:18px;flex:0 0 18px;accent-color:var(--olive-600);cursor:pointer;
+  }
+  .checklist-item .checklist-label{
+    flex:1;font-size:14px;color:var(--ink);font-weight:500;
+  }
+  .checklist-item .checklist-status{
+    font-size:11.5px;padding:3px 9px;border-radius:14px;
+    background:var(--red-50);color:var(--red);font-weight:500;
+  }
+  .checklist-item.checked .checklist-status{
+    background:#E2EDD6;color:var(--olive-600);
+  }
+
+  input,select,textarea{
+    font-family:var(--font-body);
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:8px 10px;
+    font-size:14px;
+    color:var(--ink);
+    width:100%;
+  }
+  input:focus,select:focus,textarea:focus{
+    outline:none;border-color:var(--olive-500);
+    box-shadow:0 0 0 2px rgba(91,94,61,0.15);
+  }
+  .row-actions{display:flex;justify-content:flex-end;gap:10px;align-items:center;}
+  .hint-text{font-size:12px;color:var(--ink-soft);margin-right:auto;}
+
+  button{font-family:var(--font-body);cursor:pointer;}
+  .btn{
+    border-radius:7px;padding:9px 18px;font-size:13.5px;font-weight:500;
+    border:1px solid var(--line);background:var(--paper);color:var(--ink);
+  }
+  .btn:hover{background:var(--paper-2);}
+  .btn-primary{
+    background:var(--olive-600);border-color:var(--olive-600);color:var(--paper);
+  }
+  .btn-primary:hover{background:var(--olive-700);}
+  .btn-primary:disabled{opacity:0.5;cursor:default;}
+  .btn-danger-text{
+    background:transparent;border:none;color:var(--red);font-size:12.5px;
+    padding:4px 6px;text-decoration:underline;
+  }
+  .btn-small{padding:6px 12px;font-size:12.5px;}
+
+  /* ===== Card (violation form) ===== */
+  .card{
+    background:var(--paper);border:1px solid var(--line);
+    border-radius:var(--radius);padding:22px 24px;margin-bottom:34px;
+  }
+  .field-grid{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+    gap:16px;margin-bottom:16px;
+  }
+  .field label{
+    display:block;font-size:12.5px;color:var(--ink-soft);margin-bottom:6px;font-weight:500;
+  }
+  .field-full{grid-column:1/-1;}
+
+  .violation-type-row{display:flex;gap:8px;}
+  .violation-type-row select{flex:1.4;}
+  .violation-type-row input{flex:1;}
+  .violation-type-row input[type="text"]{display:none;}
+  .violation-type-row.show-custom input[type="text"]{display:block;}
+
+  /* ===== History table ===== */
+  .tabs{display:flex;gap:6px;margin-bottom:16px;}
+  .tab-btn{
+    background:transparent;border:1px solid var(--line);border-radius:7px;
+    padding:7px 16px;font-size:13px;color:var(--ink-soft);
+  }
+  .tab-btn.active{
+    background:var(--olive-600);color:var(--paper);border-color:var(--olive-600);font-weight:500;
+  }
+  .table-wrap{
+    background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);
+    overflow-x:auto;
+    max-width:100%;
+  }
+  table{width:100%;border-collapse:collapse;font-size:13.5px;}
+  thead th{
+    background:var(--paper-2);
+    text-align:left;padding:10px 14px;
+    font-size:11.5px;color:var(--ink-soft);text-transform:uppercase;
+    letter-spacing:0.4px;font-weight:500;
+    border-bottom:1px solid var(--line);
+  }
+  tbody td{padding:10px 14px;border-bottom:1px solid var(--line);vertical-align:top;}
+  tbody tr:last-child td{border-bottom:none;}
+  tbody tr:hover{background:var(--paper-2);}
+  .tag{
+    display:inline-block;font-size:12px;padding:3px 9px;border-radius:5px;
+    background:var(--red-50);color:var(--red);font-weight:500;
+  }
+  .empty-row td{
+    text-align:center;color:var(--ink-soft);padding:30px;font-style:italic;font-size:13.5px;
+  }
+  .delete-link{
+    font-size:12px;color:var(--ink-soft);background:none;border:none;
+    text-decoration:underline;padding:0;
+  }
+  .delete-link:hover{color:var(--red);}
+
+  /* ===== Login screen ===== */
+  .login-screen{
+    min-height:100vh;display:flex;align-items:center;justify-content:center;
+    background:var(--olive-700);padding:20px;
+  }
+  .login-card{
+    background:var(--paper);border-radius:var(--radius);
+    padding:38px 36px;width:100%;max-width:360px;
+    box-shadow:0 18px 40px -18px rgba(0,0,0,0.5);
+  }
+  .login-badge{
+    width:54px;height:54px;border-radius:50%;background:var(--olive-900);
+    display:flex;align-items:center;justify-content:center;margin:0 auto 18px;
+    color:var(--olive-100);font-family:var(--font-head);font-weight:700;font-size:17px;
+  }
+  .login-card h1{
+    font-family:var(--font-head);font-size:18px;text-align:center;margin:0 0 4px;
+    color:var(--olive-700);
+  }
+  .login-card p.sub{
+    text-align:center;font-size:13px;color:var(--ink-soft);margin:0 0 24px;
+  }
+  .login-error{
+    color:var(--red);font-size:13px;margin-top:10px;text-align:center;display:none;
+  }
+  .login-card .btn-primary{width:100%;margin-top:14px;padding:11px;}
+
+  .toast{
+    position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);
+    background:var(--olive-900);color:var(--paper);
+    padding:11px 22px;border-radius:8px;font-size:13.5px;
+    opacity:0;transition:opacity 0.25s, transform 0.25s;
+    pointer-events:none;z-index:50;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+  .footnote{
+    text-align:center;font-size:12px;color:var(--ink-soft);margin-top:30px;
+  }
+
+  /* ===== Screens ===== */
+  .screen{display:none;}
+  .screen.active{display:block;}
+
+  .back-btn{
+    background:transparent;border:1px solid rgba(255,255,255,0.25);
+    color:var(--olive-200);font-size:12.5px;padding:7px 14px;border-radius:8px;
+    cursor:pointer;font-family:var(--font-body);
+    display:flex;align-items:center;gap:6px;
+  }
+  .back-btn:hover{background:rgba(255,255,255,0.08);}
+  .back-btn svg{width:14px;height:14px;}
+
+  /* ===== Main menu ===== */
+  .menu-wrap{
+    max-width:880px;margin:0 auto;padding:50px 20px 60px;
+  }
+  .menu-heading{text-align:center;margin-bottom:40px;}
+  .menu-heading .login-badge{margin:0 auto 18px;}
+  .menu-heading h1{
+    font-family:var(--font-head);font-size:21px;color:var(--paper);margin:0 0 6px;
+  }
+  .menu-heading p{font-size:13.5px;color:var(--olive-200);margin:0;}
+  .menu-grid{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:18px;
+  }
+  .menu-card{
+    background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);
+    padding:28px 22px;text-align:center;cursor:pointer;
+    transition:transform 0.15s, box-shadow 0.15s;
+  }
+  .menu-card:hover{
+    transform:translateY(-3px);
+    box-shadow:0 14px 26px -16px rgba(30,31,17,0.5);
+  }
+  .menu-card .menu-icon{
+    width:52px;height:52px;border-radius:50%;background:var(--paper-2);
+    display:flex;align-items:center;justify-content:center;margin:0 auto 16px;
+    color:var(--olive-600);font-size:22px;
+  }
+  .menu-card h3{
+    font-family:var(--font-head);font-size:16px;color:var(--olive-700);margin:0 0 6px;
+  }
+  .menu-card p{font-size:12.5px;color:var(--ink-soft);margin:0;line-height:1.5;}
+  .menu-card .count-badge{
+    display:inline-block;margin-top:12px;font-size:11.5px;
+    background:var(--paper-2);color:var(--ink-soft);padding:3px 10px;border-radius:14px;
+  }
+
+  .sub-topbar{
+    max-width:880px;margin:0 auto;padding:24px 20px 14px;
+    display:flex;align-items:center;justify-content:space-between;gap:16px;
+  }
+  .sub-title h2{
+    font-family:var(--font-head);font-size:18px;font-weight:700;color:var(--paper);margin:0;
+  }
+  .sub-title p{font-size:12.5px;color:var(--olive-200);margin:2px 0 0;}
+
+  @media (max-width:640px){
+    .duty-board-body{padding:18px 16px 20px;}
+    .card{padding:18px 16px;}
+    .table-wrap{overflow-x:auto;}
+    table{min-width:560px;}
+    .sub-topbar{
+      flex-direction:column;align-items:flex-start;gap:8px;
+      padding:20px 16px 12px;
+    }
+    .sub-title{text-align:left !important;}
+    .wrap{padding:0 16px;}
+    .duty-slot .slot-meta-row{gap:6px;flex-direction:column;}
+    .duty-slot select{font-size:13px;padding:8px 10px;}
+    .menu-wrap{padding:40px 16px 50px;}
+  }
+
+  @media (max-width:420px){
+    .duty-grid{grid-template-columns:1fr;}
+    .field-grid{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+
+<div id="loginScreen" class="login-screen">
+  <div class="login-card">
+    <div class="login-badge">รด.</div>
+    <h1>ระบบเวรจราจร รด.</h1>
+    <p class="sub">กรอกรหัสผ่านกลางเพื่อเข้าใช้งาน</p>
+    <input type="password" id="loginPassword" placeholder="รหัสผ่าน" autocomplete="off">
+    <button class="btn btn-primary" id="loginBtn">เข้าสู่ระบบ</button>
+    <p class="login-error" id="loginError">รหัสผ่านไม่ถูกต้อง ลองอีกครั้ง</p>
+  </div>
+</div>
+
+<div id="app" style="display:none;">
+
+  <!-- ===== Main menu screen ===== -->
+  <div id="screen-menu" class="screen active">
+    <div class="menu-wrap">
+      <div class="menu-heading">
+        <div class="login-badge">รด.</div>
+        <h1>ระบบเวรจราจร รด.</h1>
+        <p id="todayChip">-</p>
+      </div>
+      <div class="menu-grid">
+        <div class="menu-card" data-goto="duty">
+          <div class="menu-icon">เวร</div>
+          <h3>เวรจราจร</h3>
+          <p>บันทึกผู้ปฏิบัติหน้าที่เวรจราจรของวันนี้</p>
+        </div>
+        <div class="menu-card" data-goto="violation">
+          <div class="menu-icon">!</div>
+          <h3>บันทึกผู้กระทำผิด</h3>
+          <p>กรอกรายการเมื่อพบการกระทำผิดกฎจราจร</p>
+        </div>
+        <div class="menu-card" data-goto="inspection">
+          <div class="menu-icon">✓</div>
+          <h3>ตรวจอาคาร</h3>
+          <p>เช็กลิสต์ไฟ ประตู หน้าต่าง พัดลม แอร์ ของแต่ละห้อง</p>
+        </div>
+        <div class="menu-card" data-goto="history">
+          <div class="menu-icon">≡</div>
+          <h3>ประวัติ</h3>
+          <p>ดูประวัติเวรจราจรและผู้กระทำผิดย้อนหลัง</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Duty roster screen ===== -->
+  <div id="screen-duty" class="screen">
+    <div class="sub-topbar">
+      <button class="back-btn" data-back="1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>กลับเมนูหลัก</button>
+      <div class="sub-title" style="text-align:right;">
+        <h2>เวรจราจร</h2>
+        <p id="boardDateLabel">-</p>
+      </div>
+    </div>
+    <div class="board-shell wrap" style="margin-top:0;">
+      <div class="duty-board">
+        <div class="duty-board-tab">
+          <span><span class="dot"></span>ป้ายเวรประจำวัน</span>
+        </div>
+        <div class="duty-board-body">
+          <div class="sec-sub" style="margin-top:0;">กรอกชื่อและรหัสนักศึกษาวิชาทหารที่ปฏิบัติหน้าที่เวรจราจรของวันนี้ บันทึกแยกตามวันที่โดยอัตโนมัติ</div>
+          <div id="dutySlots" class="duty-grid"></div>
+          <div class="row-actions">
+            <span class="hint-text" id="dutySaveHint"></span>
+            <button class="btn btn-small" id="addSlotBtn">+ เพิ่มช่องเวร</button>
+            <button class="btn btn-primary btn-small" id="saveDutyBtn">บันทึกเวรวันนี้</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="footnote">ระบบเวรจราจร รด. &middot; ข้อมูลถูกบันทึกไว้สำหรับสมาชิกทุกคนที่เข้าใช้ระบบนี้</p>
+  </div>
+
+  <!-- ===== Violation log screen ===== -->
+  <div id="screen-violation" class="screen">
+    <div class="sub-topbar">
+      <button class="back-btn" data-back="1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>กลับเมนูหลัก</button>
+      <div class="sub-title" style="text-align:right;">
+        <h2>บันทึกผู้กระทำผิด</h2>
+        <p>บันทึกวันเวลาให้อัตโนมัติ</p>
+      </div>
+    </div>
+    <div class="wrap">
+      <div class="card">
+        <div class="field-grid">
+          <div class="field">
+            <label>รหัสนักศึกษาผู้กระทำผิด</label>
+            <input type="text" id="offenderId" placeholder="เช่น 12345">
+          </div>
+          <div class="field">
+            <label>หมายเลขทะเบียนรถ</label>
+            <input type="text" id="plateNumber" placeholder="เช่น กข 1234">
+          </div>
+          <div class="field">
+            <label>จังหวัด (ทะเบียนรถ)</label>
+            <select id="plateProvince"></select>
+          </div>
+          <div class="field">
+            <label>ผู้บันทึก</label>
+            <div class="violation-type-row" id="recorderTypeRow">
+              <select id="recorderType"></select>
+              <input type="text" id="recorderCustom" placeholder="ระบุผู้บันทึก...">
+            </div>
+          </div>
+          <div class="field">
+            <label>ชื่อ/รหัสผู้บันทึก (ไม่บังคับ)</label>
+            <input type="text" id="recorderDetail" placeholder="ชื่อหรือรหัส (ถ้ามี)">
+          </div>
+          <div class="field field-full">
+            <label>ประเภทความผิด</label>
+            <div class="violation-type-row" id="violationTypeRow">
+              <select id="violationSelect"></select>
+              <input type="text" id="violationCustom" placeholder="ระบุประเภทความผิด...">
+            </div>
+          </div>
+        </div>
+        <div class="row-actions">
+          <span class="hint-text" id="violationHint"></span>
+          <button class="btn btn-primary" id="submitViolationBtn">บันทึกรายการ</button>
+        </div>
+      </div>
+      <p class="footnote">ระบบเวรจราจร รด. &middot; ข้อมูลถูกบันทึกไว้สำหรับสมาชิกทุกคนที่เข้าใช้ระบบนี้</p>
+    </div>
+  </div>
+
+  <!-- ===== History screen ===== -->
+  <div id="screen-history" class="screen">
+    <div class="sub-topbar">
+      <button class="back-btn" data-back="1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>กลับเมนูหลัก</button>
+      <div class="sub-title" style="text-align:right;">
+        <h2>ประวัติย้อนหลัง</h2>
+        <p>ดูรายการที่บันทึกไว้ทั้งหมด</p>
+      </div>
+    </div>
+    <div class="wrap">
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="violations">การกระทำผิด</button>
+        <button class="tab-btn" data-tab="duty">เวรจราจร</button>
+        <button class="tab-btn" data-tab="inspection">ตรวจอาคาร</button>
+      </div>
+
+      <div id="violationsHistory" class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>วัน-เวลา</th>
+              <th>รหัสผู้กระทำผิด</th>
+              <th>ทะเบียนรถ</th>
+              <th>ประเภทความผิด</th>
+              <th>ผู้บันทึก</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="violationsTbody">
+            <tr class="empty-row"><td colspan="6">ยังไม่มีรายการบันทึก</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div id="dutyHistory" class="table-wrap" style="display:none;">
+        <table>
+          <thead>
+            <tr>
+              <th>วันที่</th>
+              <th>รายชื่อผู้ปฏิบัติเวร</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="dutyTbody">
+            <tr class="empty-row"><td colspan="3">ยังไม่มีรายการบันทึก</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div id="inspectionHistory" class="table-wrap" style="display:none;">
+        <table>
+          <thead>
+            <tr>
+              <th>วัน-เวลา</th>
+              <th>ห้อง</th>
+              <th>ผลตรวจ</th>
+              <th>ผู้บันทึก</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="inspectionTbody">
+            <tr class="empty-row"><td colspan="5">ยังไม่มีรายการบันทึก</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="footnote">ระบบเวรจราจร รด. &middot; ข้อมูลถูกบันทึกไว้สำหรับสมาชิกทุกคนที่เข้าใช้ระบบนี้</p>
+    </div>
+  </div>
+
+  <!-- ===== Building inspection screen ===== -->
+  <div id="screen-inspection" class="screen">
+    <div class="sub-topbar">
+      <button class="back-btn" data-back="1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>กลับเมนูหลัก</button>
+      <div class="sub-title" style="text-align:right;">
+        <h2>ตรวจอาคาร</h2>
+        <p>บันทึกวันเวลาให้อัตโนมัติ</p>
+      </div>
+    </div>
+    <div class="wrap">
+      <div class="card">
+        <div class="field-grid">
+          <div class="field">
+            <label>อาคาร</label>
+            <select id="inspBuilding"></select>
+          </div>
+          <div class="field" id="inspFloorField">
+            <label>ชั้น</label>
+            <select id="inspFloor"></select>
+          </div>
+          <div class="field">
+            <label>ห้อง</label>
+            <select id="inspRoom"></select>
+          </div>
+          <div class="field">
+            <label>รหัสห้อง (คำนวณอัตโนมัติ)</label>
+            <input type="text" id="inspRoomCode" readonly style="background:var(--paper-2);color:var(--ink-soft);">
+          </div>
+        </div>
+
+        <div class="field" style="margin-bottom:16px;">
+          <label>ผู้ตรวจ</label>
+          <input type="text" id="inspInspector" placeholder="ชื่อหรือรหัสผู้ตรวจ">
+        </div>
+
+        <label style="display:block;font-size:12.5px;color:var(--ink-soft);margin-bottom:10px;font-weight:500;">รายการตรวจสอบ (ติ๊ก = ปิดแล้ว/เรียบร้อย, ไม่ติ๊ก = ยังเปิด/มีปัญหา)</label>
+        <div id="inspChecklist" class="duty-grid" style="margin-bottom:18px;"></div>
+
+        <div class="row-actions">
+          <span class="hint-text" id="inspectionHint"></span>
+          <button class="btn btn-primary" id="submitInspectionBtn">บันทึกผลตรวจ</button>
+        </div>
+      </div>
+      <p class="footnote">ระบบเวรจราจร รด. &middot; ข้อมูลถูกบันทึกไว้สำหรับสมาชิกทุกคนที่เข้าใช้ระบบนี้</p>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const APP_PASSWORD = "rd2569";
+const API_URL = "https://script.google.com/macros/s/AKfycbz6ebzeQLn8nIezS9GR0UDtiC0aW3HQ69RF3f8r1RrEa3SEVsVDd_x2FdF4tRLp9IQQ/exec";
+
+async function apiGet(action){
+  const res = await fetch(`${API_URL}?action=${encodeURIComponent(action)}`);
+  const data = await res.json();
+  if(!data.ok) throw new Error(data.error || "API error");
+  return data;
+}
+
+async function apiPost(payload){
+  const res = await fetch(API_URL, {
+    method: "POST",
+    headers: { "Content-Type": "text/plain;charset=utf-8" },
+    body: JSON.stringify(payload)
+  });
+  const data = await res.json();
+  if(!data.ok) throw new Error(data.error || "API error");
+  return data;
+}
+
+const VIOLATION_TYPES = [
+  "ขับรถย้อนศร",
+  "จอดรถผิดที่/ผิดบริเวณ",
+  "ไม่สวมหมวกกันน็อค",
+  "ไม่มีใบอนุญาตขับขี่",
+  "ขับรถเร็วเกินกำหนด",
+  "ไม่จอดให้คนข้ามถนน",
+  "ส่งเสียงดัง/แต่งรถผิดกฎ",
+  "ฝ่าฝืนป้ายสัญญาณจราจร",
+  "อื่นๆ (ระบุเอง)"
+];
+
+const DUTY_TASKS = [
+  "ยืนเวรหน้าโรงเรียน",
+  "โบกรถหน้าโรงเรียน",
+  "อื่นๆ (ระบุเอง)"
+];
+
+const DUTY_SHIFTS = ["เช้า", "เย็น"];
+
+const RECORDER_TYPES = [
+  "สารวัตร",
+  "นักศึกษาวิชาทหาร (นศท.)",
+  "อื่นๆ (ระบุเอง)"
+];
+
+const THAI_PROVINCES = [
+  "กรุงเทพมหานคร","กระบี่","กาญจนบุรี","กาฬสินธุ์","กำแพงเพชร","ขอนแก่น","จันทบุรี","ฉะเชิงเทรา",
+  "ชลบุรี","ชัยนาท","ชัยภูมิ","ชุมพร","เชียงราย","เชียงใหม่","ตรัง","ตราด","ตาก","นครนายก",
+  "นครปฐม","นครพนม","นครราชสีมา","นครศรีธรรมราช","นครสวรรค์","นนทบุรี","นราธิวาส","น่าน",
+  "บึงกาฬ","บุรีรัมย์","ปทุมธานี","ประจวบคีรีขันธ์","ปราจีนบุรี","ปัตตานี","พระนครศรีอยุธยา",
+  "พังงา","พัทลุง","พิจิตร","พิษณุโลก","เพชรบุรี","เพชรบูรณ์","แพร่","พะเยา","ภูเก็ต",
+  "มหาสารคาม","มุกดาหาร","แม่ฮ่องสอน","ยโสธร","ยะลา","ร้อยเอ็ด","ระนอง","ระยอง","ราชบุรี",
+  "ลพบุรี","ลำปาง","ลำพูน","เลย","ศรีสะเกษ","สกลนคร","สงขลา","สตูล","สมุทรปราการ",
+  "สมุทรสงคราม","สมุทรสาคร","สระแก้ว","สระบุรี","สิงห์บุรี","สุโขทัย","สุพรรณบุรี",
+  "สุราษฎร์ธานี","สุรินทร์","หนองคาย","หนองบัวลำภู","อ่างทอง","อำนาจเจริญ","อุดรธานี",
+  "อุตรดิตถ์","อุทัยธานี","อุบลราชธานี"
+];
+
+const INSPECTION_BUILDINGS = ["1","2","3","4","5","6","7","8","9","100 ปี"];
+const INSPECTION_FLOORS = ["1","2","3","4"];
+const INSPECTION_ROOMS_NORMAL = ["1","2","3","4","5","6","7","8","9"];
+const INSPECTION_ROOMS_100 = ["1","2","3","4","5","6"];
+
+const INSPECTION_CHECKLIST_ITEMS = [
+  { key: "light", label: "ไฟ" },
+  { key: "door", label: "ประตู" },
+  { key: "window", label: "หน้าต่าง" },
+  { key: "fan", label: "พัดลม" },
+  { key: "aircon", label: "แอร์" }
+];
+
+function buildRoomCode(building, floor, room){
+  if(!building || !room) return "";
+  if(building === "100 ปี"){
+    return `100/${room}`;
+  }
+  if(!floor) return "";
+  return `${building}${floor}${room}`;
+}
+
+function pad(n){ return String(n).padStart(2,"0"); }
+function todayKey(){
+  const d = new Date();
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+}
+function todayThaiLabel(){
+  const days = ["อาทิตย์","จันทร์","อังคาร","พุธ","พฤหัสบดี","ศุกร์","เสาร์"];
+  const months = ["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
+  const d = new Date();
+  return `วัน${days[d.getDay()]}ที่ ${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()+543}`;
+}
+function nowDisplay(){
+  const d = new Date();
+  return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()+543} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+function localTimestamp(){
+  // เวลาท้องถิ่นของเครื่องผู้ใช้ (เช่น เวลาไทย) ในรูปแบบที่เรียงลำดับได้
+  // ไม่ใช้ toISOString() เพราะฟังก์ชันนั้นแปลงเป็น UTC เสมอ
+  const d = new Date();
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+}
+function showToast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"), 2200);
+}
+function escapeHtml(s){
+  const div = document.createElement("div");
+  div.textContent = s;
+  return div.innerHTML;
+}
+
+let dutySlotCount = 4;
+
+function buildOptionsHtml(options, selectedValue){
+  return options.map(opt =>
+    `<option value="${escapeHtml(opt)}" ${opt === selectedValue ? "selected" : ""}>${escapeHtml(opt)}</option>`
+  ).join("");
+}
+
+function renderDutySlots(existing){
+  const container = document.getElementById("dutySlots");
+  container.innerHTML = "";
+  const data = existing && existing.length ? existing : Array.from({length: dutySlotCount}, () => ({name:"", id:"", task:DUTY_TASKS[0], taskCustom:"", shift:DUTY_SHIFTS[0]}));
+  dutySlotCount = Math.max(data.length, 1);
+  data.forEach((slot, i) => {
+    const div = document.createElement("div");
+    div.className = "duty-slot";
+    const taskValue = slot.task || DUTY_TASKS[0];
+    const isCustomTask = taskValue === "อื่นๆ (ระบุเอง)";
+    div.innerHTML = `
+      <label>เวรที่ ${i+1}</label>
+      <div class="slot-fields">
+        <input type="text" class="duty-name" placeholder="ชื่อ-สกุล" value="${escapeHtml(slot.name||"")}">
+        <input type="text" class="duty-id" placeholder="รหัส" value="${escapeHtml(slot.id||"")}">
+      </div>
+      <div class="slot-meta-row">
+        <select class="duty-task">${buildOptionsHtml(DUTY_TASKS, taskValue)}</select>
+        <select class="duty-shift">${buildOptionsHtml(DUTY_SHIFTS, slot.shift || DUTY_SHIFTS[0])}</select>
+      </div>
+      <input type="text" class="duty-task-custom slot-custom-task ${isCustomTask ? "show" : ""}" placeholder="ระบุหน้าที่..." value="${escapeHtml(slot.taskCustom||"")}">
+    `;
+    const taskSelect = div.querySelector(".duty-task");
+    const customInput = div.querySelector(".duty-task-custom");
+    taskSelect.addEventListener("change", () => {
+      if(taskSelect.value === "อื่นๆ (ระบุเอง)"){
+        customInput.classList.add("show");
+        customInput.focus();
+      }else{
+        customInput.classList.remove("show");
+      }
+    });
+    container.appendChild(div);
+  });
+}
+
+function collectDutySlots(){
+  const slotEls = document.querySelectorAll("#dutySlots .duty-slot");
+  const result = [];
+  slotEls.forEach(el => {
+    const name = el.querySelector(".duty-name").value.trim();
+    const id = el.querySelector(".duty-id").value.trim();
+    const task = el.querySelector(".duty-task").value;
+    const taskCustom = el.querySelector(".duty-task-custom").value.trim();
+    const shift = el.querySelector(".duty-shift").value;
+    if(name || id) result.push({name, id, task, taskCustom, shift});
+  });
+  return result;
+}
+
+function dutyTaskLabel(slot){
+  if(slot.task === "อื่นๆ (ระบุเอง)" && slot.taskCustom) return slot.taskCustom;
+  return slot.task || "-";
+}
+
+async function loadTodayDuty(){
+  try{
+    const data = await apiGet("listDuty");
+    const records = data.records || [];
+    const todays = records.find(r => r.date === todayKey());
+    renderDutySlots(todays ? todays.slots : null);
+    document.getElementById("dutySaveHint").textContent = todays ? `บันทึกล่าสุด ${todays.savedAt || ""}` : "";
+  }catch(e){
+    renderDutySlots(null);
+    document.getElementById("dutySaveHint").textContent = "ไม่สามารถโหลดข้อมูลได้ ตรวจสอบการเชื่อมต่อ";
+  }
+}
+
+async function saveTodayDuty(){
+  const slots = collectDutySlots();
+  if(slots.length === 0){
+    showToast("กรุณากรอกข้อมูลเวรอย่างน้อย 1 คน");
+    return;
+  }
+  const payload = { action: "saveDuty", date: todayKey(), slots, savedAt: nowDisplay() };
+  try{
+    await apiPost(payload);
+    showToast("บันทึกเวรประจำวันแล้ว");
+    document.getElementById("dutySaveHint").textContent = `บันทึกล่าสุด ${payload.savedAt}`;
+    loadDutyHistory();
+  }catch(e){
+    showToast("เกิดข้อผิดพลาด ลองอีกครั้ง");
+  }
+}
+
+function setupTypeSelect(selectId, rowId, customId, options){
+  const sel = document.getElementById(selectId);
+  sel.innerHTML = "";
+  options.forEach(v => {
+    const opt = document.createElement("option");
+    opt.value = v;
+    opt.textContent = v;
+    sel.appendChild(opt);
+  });
+  const row = document.getElementById(rowId);
+  const customInput = document.getElementById(customId);
+  sel.addEventListener("change", () => {
+    if(sel.value === "อื่นๆ (ระบุเอง)"){
+      row.classList.add("show-custom");
+      customInput.focus();
+    }else{
+      row.classList.remove("show-custom");
+    }
+  });
+}
+
+function getTypeSelectValue(selectId, customId){
+  const sel = document.getElementById(selectId);
+  const customInput = document.getElementById(customId);
+  if(sel.value === "อื่นๆ (ระบุเอง)"){
+    return customInput.value.trim();
+  }
+  return sel.value;
+}
+
+function setupViolationSelect(){
+  setupTypeSelect("violationSelect", "violationTypeRow", "violationCustom", VIOLATION_TYPES);
+}
+
+function setupRecorderSelect(){
+  setupTypeSelect("recorderType", "recorderTypeRow", "recorderCustom", RECORDER_TYPES);
+}
+
+function setupProvinceSelect(){
+  const sel = document.getElementById("plateProvince");
+  sel.innerHTML = `<option value="">เลือกจังหวัด...</option>` +
+    THAI_PROVINCES.map(p => `<option value="${escapeHtml(p)}">${escapeHtml(p)}</option>`).join("");
+}
+
+function getSelectedViolationType(){
+  return getTypeSelectValue("violationSelect", "violationCustom");
+}
+
+function getSelectedRecorderType(){
+  return getTypeSelectValue("recorderType", "recorderCustom");
+}
+
+async function submitViolation(){
+  const offenderId = document.getElementById("offenderId").value.trim();
+  const plateNumber = document.getElementById("plateNumber").value.trim();
+  const plateProvince = document.getElementById("plateProvince").value;
+  const recorderType = getSelectedRecorderType();
+  const recorderDetail = document.getElementById("recorderDetail").value.trim();
+  const violationType = getSelectedViolationType();
+
+  if(!offenderId || !plateNumber || !plateProvince || !recorderType || !violationType){
+    document.getElementById("violationHint").textContent = "กรุณากรอกข้อมูลให้ครบทุกช่อง";
+    showToast("กรุณากรอกข้อมูลให้ครบทุกช่อง");
+    return;
+  }
+  document.getElementById("violationHint").textContent = "";
+
+  const btn = document.getElementById("submitViolationBtn");
+  btn.disabled = true;
+
+  const record = {
+    action: "addViolation",
+    id: `${Date.now()}-${Math.random().toString(36).slice(2,8)}`,
+    offenderId,
+    plateNumber,
+    plateProvince,
+    recorderType,
+    recorderDetail,
+    violationType,
+    timestamp: localTimestamp(),
+    displayTime: nowDisplay()
+  };
+
+  try{
+    await apiPost(record);
+    showToast("บันทึกรายการกระทำผิดแล้ว");
+    document.getElementById("offenderId").value = "";
+    document.getElementById("plateNumber").value = "";
+    document.getElementById("plateProvince").value = "";
+    document.getElementById("recorderDetail").value = "";
+    document.getElementById("recorderType").value = RECORDER_TYPES[0];
+    document.getElementById("recorderCustom").value = "";
+    document.getElementById("recorderTypeRow").classList.remove("show-custom");
+    document.getElementById("violationSelect").value = VIOLATION_TYPES[0];
+    document.getElementById("violationCustom").value = "";
+    document.getElementById("violationTypeRow").classList.remove("show-custom");
+    loadViolationsHistory();
+  }catch(e){
+    showToast("เกิดข้อผิดพลาด ลองอีกครั้ง");
+  }finally{
+    btn.disabled = false;
+  }
+}
+
+async function loadViolationsHistory(){
+  const tbody = document.getElementById("violationsTbody");
+  try{
+    const data = await apiGet("listViolations");
+    const records = data.records || [];
+    records.sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
+    if(records.length === 0){
+      tbody.innerHTML = `<tr class="empty-row"><td colspan="6">ยังไม่มีรายการบันทึก</td></tr>`;
+      return;
+    }
+    tbody.innerHTML = records.map(r => {
+      const recorderLabel = r.recorderType
+        ? (r.recorderDetail ? `${r.recorderType} (${r.recorderDetail})` : r.recorderType)
+        : (r.recorderId || "");
+      const plateLabel = r.plateNumber
+        ? `${r.plateNumber}${r.plateProvince ? " " + r.plateProvince : ""}`
+        : "-";
+      return `
+      <tr>
+        <td>${escapeHtml(r.displayTime || "")}</td>
+        <td>${escapeHtml(r.offenderId || "")}</td>
+        <td>${escapeHtml(plateLabel)}</td>
+        <td><span class="tag">${escapeHtml(r.violationType || "")}</span></td>
+        <td>${escapeHtml(recorderLabel)}</td>
+        <td><button class="delete-link" onclick="deleteViolation('${r.id}')">ลบ</button></td>
+      </tr>
+    `;
+    }).join("");
+  }catch(e){
+    tbody.innerHTML = `<tr class="empty-row"><td colspan="6">ไม่สามารถโหลดข้อมูลได้ ตรวจสอบการเชื่อมต่อ</td></tr>`;
+  }
+}
+
+async function deleteViolation(id){
+  if(!confirm("ยืนยันการลบรายการนี้?")) return;
+  try{
+    await apiPost({ action: "deleteViolation", id });
+    showToast("ลบรายการแล้ว");
+    loadViolationsHistory();
+  }catch(e){
+    showToast("ไม่สามารถลบรายการได้");
+  }
+}
+
+async function loadDutyHistory(){
+  const tbody = document.getElementById("dutyTbody");
+  try{
+    const data = await apiGet("listDuty");
+    const records = data.records || [];
+    records.sort((a,b) => (b.date || "").localeCompare(a.date || ""));
+    if(records.length === 0){
+      tbody.innerHTML = `<tr class="empty-row"><td colspan="3">ยังไม่มีรายการบันทึก</td></tr>`;
+      return;
+    }
+    tbody.innerHTML = records.map(r => {
+      const rows = (r.slots || []).map(s =>
+        `<div style="margin-bottom:4px;">${escapeHtml(s.name||"-")} (${escapeHtml(s.id||"-")}) — <span style="color:var(--ink-soft);">${escapeHtml(dutyTaskLabel(s))} · ${escapeHtml(s.shift||"-")}</span></div>`
+      ).join("");
+      return `
+        <tr>
+          <td>${escapeHtml(r.date || "")}</td>
+          <td>${rows || "-"}</td>
+          <td><button class="delete-link" onclick="deleteDuty('${r.date}')">ลบ</button></td>
+        </tr>
+      `;
+    }).join("");
+  }catch(e){
+    tbody.innerHTML = `<tr class="empty-row"><td colspan="3">ไม่สามารถโหลดข้อมูลได้ ตรวจสอบการเชื่อมต่อ</td></tr>`;
+  }
+}
+
+async function deleteDuty(date){
+  if(!confirm("ยืนยันการลบบันทึกเวรของวันนี้?")) return;
+  try{
+    await apiPost({ action: "deleteDuty", date });
+    showToast("ลบรายการแล้ว");
+    loadDutyHistory();
+    if(date === todayKey()) renderDutySlots(null);
+  }catch(e){
+    showToast("ไม่สามารถลบรายการได้");
+  }
+}
+
+function setupInspectionSelects(){
+  const buildingSel = document.getElementById("inspBuilding");
+  buildingSel.innerHTML = INSPECTION_BUILDINGS.map(b => `<option value="${escapeHtml(b)}">อาคาร ${escapeHtml(b)}</option>`).join("");
+
+  function refreshFloorAndRoom(){
+    const building = buildingSel.value;
+    const floorField = document.getElementById("inspFloorField");
+    const floorSel = document.getElementById("inspFloor");
+    const roomSel = document.getElementById("inspRoom");
+
+    if(building === "100 ปี"){
+      floorField.style.display = "none";
+      roomSel.innerHTML = INSPECTION_ROOMS_100.map(r => `<option value="${escapeHtml(r)}">ห้อง ${escapeHtml(r)}</option>`).join("");
+    }else{
+      floorField.style.display = "block";
+      floorSel.innerHTML = INSPECTION_FLOORS.map(f => `<option value="${escapeHtml(f)}">ชั้น ${escapeHtml(f)}</option>`).join("");
+      roomSel.innerHTML = INSPECTION_ROOMS_NORMAL.map(r => `<option value="${escapeHtml(r)}">ห้อง ${escapeHtml(r)}</option>`).join("");
+    }
+    updateInspRoomCode();
+  }
+
+  function updateInspRoomCode(){
+    const building = buildingSel.value;
+    const floor = building === "100 ปี" ? "" : document.getElementById("inspFloor").value;
+    const room = document.getElementById("inspRoom").value;
+    document.getElementById("inspRoomCode").value = buildRoomCode(building, floor, room);
+  }
+
+  buildingSel.addEventListener("change", refreshFloorAndRoom);
+  document.getElementById("inspFloor").addEventListener("change", updateInspRoomCode);
+  document.getElementById("inspRoom").addEventListener("change", updateInspRoomCode);
+
+  refreshFloorAndRoom();
+}
+
+function renderInspectionChecklist(){
+  const container = document.getElementById("inspChecklist");
+  container.innerHTML = INSPECTION_CHECKLIST_ITEMS.map(item => `
+    <label class="checklist-item" data-key="${item.key}">
+      <input type="checkbox" class="insp-check" data-key="${item.key}">
+      <span class="checklist-label">${escapeHtml(item.label)}</span>
+      <span class="checklist-status">ยังเปิด/มีปัญหา</span>
+    </label>
+  `).join("");
+  container.querySelectorAll(".insp-check").forEach(cb => {
+    cb.addEventListener("change", () => {
+      const item = cb.closest(".checklist-item");
+      const statusEl = item.querySelector(".checklist-status");
+      if(cb.checked){
+        item.classList.add("checked");
+        statusEl.textContent = "ปิดแล้ว/เรียบร้อย";
+      }else{
+        item.classList.remove("checked");
+        statusEl.textContent = "ยังเปิด/มีปัญหา";
+      }
+    });
+  });
+}
+
+function resetInspectionChecklist(){
+  const container = document.getElementById("inspChecklist");
+  container.querySelectorAll(".insp-check").forEach(cb => { cb.checked = false; });
+  container.querySelectorAll(".checklist-item").forEach(item => {
+    item.classList.remove("checked");
+    item.querySelector(".checklist-status").textContent = "ยังเปิด/มีปัญหา";
+  });
+}
+
+const CHECKLIST_STATUS_CLOSED = "ปิดแล้ว/เรียบร้อย";
+const CHECKLIST_STATUS_OPEN = "เปิด";
+
+function collectInspectionChecklist(){
+  const result = {};
+  document.querySelectorAll("#inspChecklist .insp-check").forEach(cb => {
+    const item = INSPECTION_CHECKLIST_ITEMS.find(i => i.key === cb.dataset.key);
+    const thaiKey = item ? item.label : cb.dataset.key;
+    result[thaiKey] = cb.checked ? CHECKLIST_STATUS_CLOSED : CHECKLIST_STATUS_OPEN;
+  });
+  return result;
+}
+
+function inspectionSummaryLabel(checklist){
+  const labels = INSPECTION_CHECKLIST_ITEMS.map(item => item.label);
+  const closedCount = labels.filter(label => checklist[label] === CHECKLIST_STATUS_CLOSED).length;
+  return `${closedCount}/${labels.length} ปิดแล้ว/เรียบร้อย`;
+}
+
+function inspectionDetailLabel(checklist){
+  return INSPECTION_CHECKLIST_ITEMS.map(item =>
+    `${escapeHtml(item.label)}: ${escapeHtml(checklist[item.label] || CHECKLIST_STATUS_OPEN)}`
+  ).join(" · ");
+}
+
+async function submitInspection(){
+  const building = document.getElementById("inspBuilding").value;
+  const floor = building === "100 ปี" ? "" : document.getElementById("inspFloor").value;
+  const room = document.getElementById("inspRoom").value;
+  const roomCode = buildRoomCode(building, floor, room);
+  const inspector = document.getElementById("inspInspector").value.trim();
+  const checklist = collectInspectionChecklist();
+
+  if(!inspector){
+    document.getElementById("inspectionHint").textContent = "กรุณากรอกชื่อผู้ตรวจ";
+    showToast("กรุณากรอกชื่อผู้ตรวจ");
+    return;
+  }
+  const allChecked = INSPECTION_CHECKLIST_ITEMS.every(item => checklist[item.label] === CHECKLIST_STATUS_CLOSED);
+  if(!allChecked){
+    const confirmPartial = confirm("ยังมีบางหัวข้อที่ไม่ติ๊ก (ยังเปิด/มีปัญหา) ต้องการบันทึกต่อหรือไม่?");
+    if(!confirmPartial) return;
+  }
+  document.getElementById("inspectionHint").textContent = "";
+
+  const btn = document.getElementById("submitInspectionBtn");
+  btn.disabled = true;
+
+  const record = {
+    action: "addInspection",
+    id: `${Date.now()}-${Math.random().toString(36).slice(2,8)}`,
+    roomCode,
+    building,
+    floor,
+    room,
+    inspector,
+    checklistJson: JSON.stringify(checklist),
+    timestamp: localTimestamp(),
+    displayTime: nowDisplay()
+  };
+
+  try{
+    await apiPost(record);
+    showToast("บันทึกผลตรวจอาคารแล้ว");
+    document.getElementById("inspInspector").value = "";
+    resetInspectionChecklist();
+    loadInspectionHistory();
+  }catch(e){
+    showToast("เกิดข้อผิดพลาด ลองอีกครั้ง");
+  }finally{
+    btn.disabled = false;
+  }
+}
+
+async function loadInspectionHistory(){
+  const tbody = document.getElementById("inspectionTbody");
+  try{
+    const data = await apiGet("listInspections");
+    const records = data.records || [];
+    records.sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
+    if(records.length === 0){
+      tbody.innerHTML = `<tr class="empty-row"><td colspan="5">ยังไม่มีรายการบันทึก</td></tr>`;
+      return;
+    }
+    tbody.innerHTML = records.map(r => {
+      let checklist = {};
+      try{ checklist = r.checklistJson ? JSON.parse(r.checklistJson) : {}; }catch(e){}
+      return `
+      <tr>
+        <td>${escapeHtml(r.displayTime || "")}</td>
+        <td>${escapeHtml(r.roomCode || "-")}</td>
+        <td>
+          <div>${escapeHtml(inspectionSummaryLabel(checklist))}</div>
+          <div style="font-size:11.5px;color:var(--ink-soft);margin-top:2px;">${inspectionDetailLabel(checklist)}</div>
+        </td>
+        <td>${escapeHtml(r.inspector || "")}</td>
+        <td><button class="delete-link" onclick="deleteInspection('${r.id}')">ลบ</button></td>
+      </tr>
+    `;
+    }).join("");
+  }catch(e){
+    tbody.innerHTML = `<tr class="empty-row"><td colspan="5">ไม่สามารถโหลดข้อมูลได้ ตรวจสอบการเชื่อมต่อ</td></tr>`;
+  }
+}
+
+async function deleteInspection(id){
+  if(!confirm("ยืนยันการลบรายการนี้?")) return;
+  try{
+    await apiPost({ action: "deleteInspection", id });
+    showToast("ลบรายการแล้ว");
+    loadInspectionHistory();
+  }catch(e){
+    showToast("ไม่สามารถลบรายการได้");
+  }
+}
+
+function setupTabs(){
+  const buttons = document.querySelectorAll(".tab-btn");
+  buttons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      buttons.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      const tab = btn.dataset.tab;
+      document.getElementById("violationsHistory").style.display = tab === "violations" ? "block" : "none";
+      document.getElementById("dutyHistory").style.display = tab === "duty" ? "block" : "none";
+      document.getElementById("inspectionHistory").style.display = tab === "inspection" ? "block" : "none";
+    });
+  });
+}
+
+function goToScreen(name){
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.getElementById(`screen-${name}`).classList.add("active");
+  window.scrollTo(0,0);
+  if(name === "duty") loadTodayDuty();
+  if(name === "violation"){
+    document.getElementById("offenderId").value = "";
+    document.getElementById("plateNumber").value = "";
+    document.getElementById("plateProvince").value = "";
+    document.getElementById("recorderDetail").value = "";
+    document.getElementById("violationHint").textContent = "";
+  }
+  if(name === "inspection"){
+    document.getElementById("inspInspector").value = "";
+    document.getElementById("inspectionHint").textContent = "";
+    resetInspectionChecklist();
+  }
+  if(name === "history"){
+    loadViolationsHistory();
+    loadDutyHistory();
+    loadInspectionHistory();
+  }
+}
+
+function setupNavigation(){
+  document.querySelectorAll(".menu-card").forEach(card => {
+    card.addEventListener("click", () => goToScreen(card.dataset.goto));
+  });
+  document.querySelectorAll("[data-back]").forEach(btn => {
+    btn.addEventListener("click", () => goToScreen("menu"));
+  });
+}
+
+function initApp(){
+  document.getElementById("todayChip").textContent = todayThaiLabel();
+  document.getElementById("boardDateLabel").textContent = todayThaiLabel();
+  setupViolationSelect();
+  setupRecorderSelect();
+  setupProvinceSelect();
+  setupInspectionSelects();
+  renderInspectionChecklist();
+  setupTabs();
+  setupNavigation();
+  loadTodayDuty();
+
+  document.getElementById("addSlotBtn").addEventListener("click", () => {
+    const current = collectDutySlots();
+    const blank = {name:"", id:"", task:DUTY_TASKS[0], taskCustom:"", shift:DUTY_SHIFTS[0]};
+    current.push(blank);
+    renderDutySlots(current.length ? current : [blank]);
+  });
+  document.getElementById("saveDutyBtn").addEventListener("click", saveTodayDuty);
+  document.getElementById("submitViolationBtn").addEventListener("click", submitViolation);
+  document.getElementById("submitInspectionBtn").addEventListener("click", submitInspection);
+}
+
+let appUnlocked = false;
+
+function tryLogin(){
+  const input = document.getElementById("loginPassword").value;
+  const errEl = document.getElementById("loginError");
+  if(input === APP_PASSWORD){
+    appUnlocked = true;
+    errEl.style.display = "none";
+    document.getElementById("loginScreen").style.display = "none";
+    document.getElementById("app").style.display = "block";
+    initApp();
+  }else{
+    errEl.style.display = "block";
+  }
+}
+
+document.getElementById("loginBtn").addEventListener("click", tryLogin);
+document.getElementById("loginPassword").addEventListener("keydown", (e) => {
+  if(e.key === "Enter") tryLogin();
+});
+</script>
+</body>
+</html>
